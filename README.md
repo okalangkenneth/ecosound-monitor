@@ -2,6 +2,11 @@
 
 **Automated Wildlife Compliance Platform for Renewable Energy**
 
+![Detection results](https://github.com/user-attachments/assets/b5a70662-74c0-4d2b-a7a6-b13802d6be0d)
+
+
+
+
 A full-stack demo application showcasing automated bat and bird monitoring for wind farms using audio-based ML detection.
 
 ## 🎯 Project Overview
