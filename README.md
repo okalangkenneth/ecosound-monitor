@@ -4,6 +4,7 @@
 
 ![Detection results](https://github.com/user-attachments/assets/b5a70662-74c0-4d2b-a7a6-b13802d6be0d)
 
+![wildlife](https://github.com/user-attachments/assets/4c266fed-ddaf-44b1-b718-84a54a169cd3)
 
 
 
