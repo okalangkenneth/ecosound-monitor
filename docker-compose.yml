@@ -1,10 +1,13 @@
 version: "3.9"
 
+# Default: docker compose up --build  (lite image, ~800MB, bird detection only)
+# Full:    docker compose --profile full up --build  (5.8GB, adds bat detection)
+
 services:
   backend:
     build:
       context: ./backend
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.lite
     container_name: ecosound-backend
     restart: unless-stopped
     volumes:
@@ -13,6 +16,30 @@ services:
       - ecosound-db:/app
     environment:
       - PYTHONUNBUFFERED=1
+      - BAT_DETECTION_ENABLED=false
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  backend-full:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: ecosound-backend-full
+    restart: unless-stopped
+    profiles: ["full"]
+    volumes:
+      - ./backend/uploads:/app/uploads
+      - ./backend/reports:/app/reports
+      - ecosound-db:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+      - BAT_DETECTION_ENABLED=true
     ports:
       - "8000:8000"
     healthcheck:
