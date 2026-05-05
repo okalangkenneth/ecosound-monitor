@@ -1,20 +1,30 @@
 # EcoSound Monitor
 
+![CI](https://github.com/okalangkenneth/ecosound-monitor/actions/workflows/ci.yml/badge.svg)
+![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)
+![Python 3.10](https://img.shields.io/badge/python-3.10-blue.svg)
+
 **Automated Wildlife Compliance Platform for Renewable Energy**
 
-![Detection results](https://github.com/user-attachments/assets/b5a70662-74c0-4d2b-a7a6-b13802d6be0d)
+A full-stack application for automated bat and bird monitoring at wind farms using
+audio-based ML detection. Helps operators comply with EU wildlife regulations without
+costly manual surveys.
 
-![wildlife](https://github.com/user-attachments/assets/4c266fed-ddaf-44b1-b718-84a54a169cd3)
+## 🐳 Docker Quick Start (Recommended)
 
+```bash
+git clone https://github.com/okalangkenneth/ecosound-monitor.git
+cd ecosound-monitor
+docker compose up --build
+```
 
-
-A full-stack demo application showcasing automated bat and bird monitoring for wind farms using audio-based ML detection.
+Open http://localhost:3000 — done.
 
 ## 🎯 Project Overview
 
-This MVP demonstrates:
 - ✅ Full-stack Python (FastAPI) + React development
-- ✅ Machine Learning integration (BirdNET for audio classification)
+- ✅ Machine Learning integration (BirdNET for bird audio classification)
+- ✅ Real bat detection via BatDetect2 (requires ultrasonic audio ≥192kHz)
 - ✅ Real-time audio processing and species detection
 - ✅ Interactive data visualization (charts, tables)
 - ✅ Compliance report generation (PDF)
@@ -27,23 +37,22 @@ ecosound-monitor/
 ├── backend/           # FastAPI server with ML detection
 │   ├── api/          # REST API endpoints
 │   ├── models/       # Database models (SQLAlchemy)
-│   ├── services/     # BirdNET & bat detection services
-│   └── uploads/      # Audio file storage
+│   ├── services/     # BirdNET & BatDetect2 detection services
+│   └── tests/        # pytest test suite
 ├── frontend/         # React dashboard
 │   └── src/
 │       ├── components/
 │       └── App.jsx
-└── demo_audio/       # Sample audio files
+└── demo_audio/       # Sample audio sources
 ```
 
-## 🚀 Quick Start
+## 🚀 Manual Setup
 
 ### Prerequisites
-- Python 3.9+
-- Node.js 16+
-- pip and npm
+- Python 3.10+
+- Node.js 18+
 
-### Backend Setup
+### Backend
 
 ```bash
 cd backend
@@ -51,11 +60,9 @@ pip install -r requirements.txt
 python main.py
 ```
 
-Backend will run at: `http://localhost:8000`
+Backend: http://localhost:8000 | API docs: http://localhost:8000/docs
 
-API Documentation: `http://localhost:8000/docs`
-
-### Frontend Setup
+### Frontend
 
 ```bash
 cd frontend
@@ -63,7 +70,7 @@ npm install
 npm run dev
 ```
 
-Frontend will run at: `http://localhost:3000`
+Frontend: http://localhost:3000
 
 ## 📋 Features
 
@@ -74,7 +81,7 @@ Frontend will run at: `http://localhost:3000`
 
 ### 2. Automated Species Detection
 - **BirdNET** integration for European bird species
-- Simulated bat detection (Pipistrellus, Myotis, etc.)
+- **BatDetect2** for bat echolocation calls (ultrasonic audio required)
 - Confidence scoring for each detection
 - Timestamp tracking
 
@@ -91,117 +98,37 @@ Frontend will run at: `http://localhost:3000`
 
 ## 🔧 Tech Stack
 
-**Backend:**
-- FastAPI - Modern Python web framework
-- BirdNET - Pre-trained bird audio classification
-- Librosa - Audio signal processing
-- SQLAlchemy - ORM for SQLite database
-- ReportLab - PDF generation
+**Backend:** FastAPI · BirdNET (birdnetlib) · BatDetect2 · Librosa · SQLAlchemy · ReportLab
 
-**Frontend:**
-- React 18 - UI framework
-- Vite - Build tool
-- TailwindCSS - Styling
-- Recharts - Data visualization
-- Axios - HTTP client
-- React Dropzone - File uploads
+**Frontend:** React 18 · Vite · TailwindCSS · Recharts · Axios
 
 ## 📊 Use Case: Wind Farm Compliance
 
-This platform addresses a critical need in the renewable energy sector:
+Wind farms in EU countries (Sweden, Norway, Denmark, Germany) must monitor wildlife
+to comply with environmental regulations. EcoSound Monitor automates this by:
 
-**Problem:** Wind farms in EU countries must monitor wildlife (birds/bats) to comply with environmental regulations. Traditional manual surveys are expensive and time-consuming.
-
-**Solution:** Automated audio-based monitoring using ML to:
-1. Deploy acoustic sensors at wind farm sites
-2. Continuously record environmental audio
-3. Automatically identify species using ML models
-4. Generate regulatory compliance reports
-5. Alert operators to high-risk periods
-
-**Market:** Sweden, Norway, Denmark, Germany have extensive wind farm development and strict environmental regulations.
-
-## 🎯 Demo Workflow
-
-1. **Upload Audio** - Drop a bird/bat audio recording
-2. **Automatic Processing** - BirdNET analyzes for species
-3. **View Results** - See detections in dashboard
-4. **Generate Report** - Download PDF compliance report
+1. Processing acoustic sensor recordings from the field
+2. Identifying bird and bat species via ML models
+3. Generating regulatory compliance PDF reports
 
 ## 📝 API Endpoints
 
-### Audio Processing
-- `POST /api/audio/upload` - Upload and analyze audio
-- `GET /api/audio/recordings` - List all recordings
-- `GET /api/audio/detections/{id}` - Get detections for recording
-- `GET /api/audio/stats` - Overall statistics
+- `POST /api/audio/upload` — Upload and analyze audio
+- `GET /api/audio/recordings` — List all recordings
+- `GET /api/audio/detections/{id}` — Get detections for a recording
+- `GET /api/audio/stats` — Overall statistics
+- `GET /api/reports/generate/{id}` — Generate PDF compliance report
 
-### Reports
-- `GET /api/reports/generate/{id}` - Generate PDF report
+## 🧪 Running Tests
 
-## 🔮 Production Roadmap
+```bash
+pytest backend/tests/ -v
+```
 
-**Current MVP includes:**
-- Basic audio upload and detection
-- Simple dashboard and visualization
-- PDF report generation
+## 🤝 Contributing
 
-**Production version would add:**
-- Real BatDetect2 integration (not simulated)
-- Real-time streaming from field sensors
-- Advanced audio analytics (spectrograms, sonograms)
-- Multi-site management
-- User authentication & roles
-- Regulatory compliance templates (EU directives)
-- Alert system for endangered species
-- Integration with wind turbine control systems
+See [CONTRIBUTING.md](CONTRIBUTING.md) for setup instructions and contribution guidelines.
 
-- Mobile app for field technicians
-- Cloud deployment (AWS/GCP)
+## 📄 License
 
-## 🧪 Testing the Demo
-
-### Get Sample Audio Files
-
-Download bird audio from Xeno-Canto:
-https://xeno-canto.org/
-
-Or use these pre-recorded samples:
-- European Robin: https://xeno-canto.org/600000
-- Common Pipistrelle (bat): Research datasets
-
-### Expected Results
-
-Upload a bird audio file and you should see:
-- Species detections with confidence scores
-- Timeline of detections
-- Visual charts showing species distribution
-- Downloadable PDF report
-
-## 🎓 What This Demonstrates
-
-**Technical Skills:**
-- Full-stack web development (Python + React)
-- RESTful API design
-- Machine Learning model integration
-- Audio signal processing
-- Data visualization
-- PDF generation
-- Database design (SQLAlchemy)
-- Modern React patterns (hooks, state management)
-- Responsive UI design (TailwindCSS)
-
-**Domain Knowledge:**
-- Wildlife monitoring regulations
-- Renewable energy compliance
-- Bioacoustics (audio-based wildlife detection)
-- European bat and bird species
-- Environmental impact assessment
-
-## 📧 Contact
-
-Built by Kenneth as an MVP demonstration for eco-tech opportunities in wildlife compliance.
-
----
-
-**Note:** This is a demo/MVP. Bat detection is currently simulated. Production version would integrate BatDetect2 or similar validated models.
+MIT — see [LICENSE](LICENSE)
