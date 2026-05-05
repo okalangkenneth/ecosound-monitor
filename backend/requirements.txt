@@ -12,3 +12,7 @@ reportlab==4.0.7
 python-dotenv==1.0.0
 soundfile==0.12.1
 birdnetlib==0.8.0
+batdetect2
+pytest
+pytest-asyncio
+httpx

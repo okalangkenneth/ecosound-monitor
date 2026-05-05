@@ -26,7 +26,7 @@ The world's largest collection of bird sounds.
 **Website:** https://www.birds.cornell.edu/home/
 
 ### 4. Bat Call Library
-For bat audio samples:
+For bat audio samples (requires ultrasonic recorder ≥192kHz):
 - **Bat Conservation Trust**: https://www.bats.org.uk/
 - **Open Acoustic Devices**: https://www.openacousticdevices.info/
 
@@ -48,6 +48,9 @@ When you upload a bird recording, you should see:
 
 ## Note
 
-The current MVP uses BirdNET for bird detection which works very well.
-Bat detection is currently simulated for demo purposes - a production version 
-would integrate BatDetect2 or similar validated models.
+Bird detection uses BirdNET via birdnetlib — one of the most accurate bird audio
+classifiers available, trained on thousands of species worldwide.
+
+Bat detection uses BatDetect2 and requires ultrasonic audio recorded at ≥192kHz
+(e.g. AudioMoth, Pettersson D500X). Standard 44.1kHz/48kHz recordings will not
+produce bat detections as bat echolocation calls are above standard microphone range.

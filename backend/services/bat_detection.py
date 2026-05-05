@@ -1,59 +1,70 @@
 import librosa
 import numpy as np
 from typing import List, Dict
-import random
 
 class BatDetectionService:
     """
-    Simplified bat detection service for MVP demo
-    In production, this would use BatDetect2 or similar ML models
+    Real bat detection service using BatDetect2 ML model.
+
+    NOTE: BatDetect2 is designed for ultrasonic audio recordings (>=192kHz sample rate).
+    Standard audio files recorded at 44.1kHz or 48kHz will not produce bat detections
+    as bat echolocation calls occur at 20-120kHz, above the range of standard microphones.
+    Use an ultrasonic recorder (e.g. AudioMoth, Pettersson D500X) for real detections.
     """
-    
-    # Common European bat species for demo
-    BAT_SPECIES = [
-        {'scientific': 'Pipistrellus pipistrellus', 'common': 'Common Pipistrelle'},
-        {'scientific': 'Myotis daubentonii', 'common': "Daubenton's Bat"},
-        {'scientific': 'Eptesicus serotinus', 'common': 'Serotine Bat'},
-        {'scientific': 'Nyctalus noctula', 'common': 'Common Noctule'},
-        {'scientific': 'Plecotus auritus', 'common': 'Brown Long-eared Bat'},
-    ]
-    
+
     def __init__(self):
-        pass
-    
+        self._model = None
+
+    def _load_model(self):
+        """Lazy-load BatDetect2 model on first use to keep startup fast."""
+        if self._model is None:
+            try:
+                import batdetect2.api as bd2
+                self._bd2 = bd2
+            except ImportError:
+                raise RuntimeError(
+                    "batdetect2 is not installed. Run: pip install batdetect2"
+                )
+
     def analyze_audio(self, audio_path: str, min_confidence: float = 0.3) -> List[Dict]:
         """
-        Analyze audio for bat echolocation calls
-        This is a simplified demo version that simulates detections
+        Analyze audio file for bat echolocation calls using BatDetect2.
+
+        Args:
+            audio_path: Path to audio file (WAV recommended, >=192kHz for real detections)
+            min_confidence: Minimum confidence threshold (0-1), default 0.3
+
+        Returns:
+            List of detections with species, confidence, and timestamp.
+            Returns empty list if file is incompatible or an error occurs.
         """
         try:
-            # Load audio to get duration
-            y, sr = librosa.load(audio_path, sr=None)
-            duration = librosa.get_duration(y=y, sr=sr)
-            
-            # For demo: simulate bat detections based on high-frequency content
+            self._load_model()
+
+            results = self._bd2.process_file(
+                audio_path,
+                detection_threshold=min_confidence
+            )
+
             detections = []
-            
-            # Check if audio has high-frequency content (potential bat calls)
-            if sr >= 44100:  # Need high sample rate for bat calls
-                # Simulate 2-5 detections for demo
-                num_detections = random.randint(2, 5)
-                
-                for i in range(num_detections):
-                    species = random.choice(self.BAT_SPECIES)
-                    timestamp = random.uniform(0, duration)
-                    confidence = random.uniform(min_confidence, 0.95)
-                    
+            annotations = results.get("pred_dict", {}).get("annotation", [])
+
+            for ann in annotations:
+                species = ann.get("class", "Unknown bat species")
+                confidence = float(ann.get("class_prob", 0.0))
+                start_time = float(ann.get("start_time", 0.0))
+
+                if confidence >= min_confidence:
                     detections.append({
-                        'species_name': species['scientific'],
-                        'common_name': species['common'],
-                        'confidence': confidence,
-                        'timestamp': timestamp,
-                        'detection_type': 'bat'
+                        "species_name": species,
+                        "common_name": species,
+                        "confidence": confidence,
+                        "timestamp": start_time,
+                        "detection_type": "bat"
                     })
-            
-            return sorted(detections, key=lambda x: x['timestamp'])
-            
+
+            return sorted(detections, key=lambda x: x["timestamp"])
+
         except Exception as e:
-            print(f"Error analyzing audio for bats: {str(e)}")
+            print(f"BatDetect2 error analyzing {audio_path}: {str(e)}")
             return []
