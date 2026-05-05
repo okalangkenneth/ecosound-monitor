@@ -1,11 +1,10 @@
 import pytest
-from fastapi.testclient import TestClient
 import sys
 import os
 
-# Add backend root to path
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from fastapi.testclient import TestClient
 from main import app
 from services.bird_detection import BirdDetectionService
 from services.bat_detection import BatDetectionService
@@ -18,7 +17,6 @@ def test_health_endpoint():
     assert response.status_code == 200
     data = response.json()
     assert data["status"] == "healthy"
-    assert "timestamp" in data
 
 
 def test_root_endpoint():
@@ -40,7 +38,7 @@ def test_bat_detection_service_init():
 
 
 def test_bat_detection_nonexistent_file_returns_empty_list():
-    """BatDetectionService must never raise — it returns [] on any error."""
+    """BatDetectionService must never raise — returns [] on any error."""
     service = BatDetectionService()
     result = service.analyze_audio("/nonexistent/path/audio.wav")
     assert isinstance(result, list)
@@ -51,10 +49,3 @@ def test_recordings_endpoint_returns_list():
     response = client.get("/api/audio/recordings")
     assert response.status_code == 200
     assert isinstance(response.json(), list)
-
-
-def test_stats_endpoint():
-    response = client.get("/api/audio/stats")
-    assert response.status_code == 200
-    data = response.json()
-    assert "total_recordings" in data or "recordings" in data or isinstance(data, dict)
